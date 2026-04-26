@@ -42,3 +42,45 @@ I just got an idea.
 I do not know if I will build it.
 But if the domain is cheap, I might buy it.
 ```
+
+## 10. Roadmap
+
+### 10. Almost bought wall
+
+A public wall of domains people almost bought.
+
+This should feel social, voyeuristic, and lightweight. People love seeing what others nearly claimed.
+
+#### Almost bought today
+
+- `rentafounder.xyz`
+- `buttonfarm.site`
+- `auntieapi.fun`
+- `sponsorcrate.xyz`
+
+#### Feature notes
+
+- Show the promo price next to each domain.
+- Add a claim post generator for domains someone actually buys.
+
+If someone buys a domain, let them generate:
+
+```txt
+I bought fanledger.site for $1.98.
+
+No idea if I’ll build it.
+That is tomorrow’s problem.
+```
+
+## 11. Monetization Later
+
+Start with affiliate links.
+
+Later add:
+
+- Sponsored daily drops
+- Newsletter sponsorships
+- Premium filters
+- Domain deal email
+- Startup naming packs
+- Featured registrar partnerships

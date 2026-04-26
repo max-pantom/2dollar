@@ -248,9 +248,9 @@ export default function Brand2Page() {
   return (
     <div className="min-h-dvh">
       <div className="mx-auto w-full max-w-6xl px-6 py-10">
-        <div className="flex flex-col gap-6">
-          <div className="space-y-2 text-center">
-            <div className="inline-flex items-center justify-center gap-2 font-mono text-xs tracking-widest uppercase text-muted-foreground">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 font-mono text-xs tracking-widest uppercase text-muted-foreground">
               <span className="rounded border border-border bg-muted/40 px-2 py-1">
                 /brand/2
               </span>
@@ -259,12 +259,12 @@ export default function Brand2Page() {
             <h1 className="mode-headline text-3xl font-semibold tracking-tight md:text-5xl">
               mix every letter.
             </h1>
-            <p className="mx-auto max-w-2xl text-pretty text-sm text-muted-foreground">
+            <p className="max-w-2xl text-pretty text-sm text-muted-foreground">
               Type a word. Every character gets a different vibe (fonts + invented
               glyph styles). Randomize until it feels like a logo. Copy SVG.
             </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button type="button" onClick={randomizeAll} size="sm">
               randomize all
             </Button>
