@@ -9,10 +9,7 @@ import { SiteHeader } from "@/components/site-header"
 import { Sticker } from "@/components/sticker"
 import { ResolvedDomainCard } from "@/components/resolved-domain-card"
 import { useStaggeredReveal } from "@/components/staggered-reveal"
-import {
-  type ParsedQuery,
-  type DomainResult,
-} from "@/lib/domain/search"
+import type { DomainResult, ParsedQuery } from "@/lib/domain/types"
 
 export function SearchClient({ initialQuery }: { initialQuery: string }) {
   const [query] = useState(initialQuery)

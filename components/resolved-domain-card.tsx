@@ -1,6 +1,6 @@
 import { DomainCard } from "@/components/domain-card"
 import { AvailabilityTag } from "@/components/availability-tag"
-import type { DomainResult } from "@/lib/domain/search"
+import type { DomainResult } from "@/lib/domain/types"
 
 export function ResolvedDomainCard({
   result,
