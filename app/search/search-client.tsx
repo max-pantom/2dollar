@@ -7,13 +7,23 @@ import { SearchBox } from "@/components/search-box"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { Sticker } from "@/components/sticker"
-import { ResolvedDomainCard } from "@/components/resolved-domain-card"
-import { useStaggeredReveal } from "@/components/staggered-reveal"
-import type { DomainResult, ParsedQuery } from "@/lib/domain/types"
+import { StreamingDomainCard } from "@/components/streaming-domain-card"
+import type {
+  DomainResult,
+  ParsedQuery,
+  StreamingDomainResult,
+} from "@/lib/domain/types"
+
+function toStreamingResults(rows: DomainResult[]): StreamingDomainResult[] {
+  return rows.map((r) => ({
+    ...r,
+    availability: Promise.resolve(r.availability),
+  }))
+}
 
 export function SearchClient({ initialQuery }: { initialQuery: string }) {
   const [query] = useState(initialQuery)
-  const [results, setResults] = useState<DomainResult[]>([])
+  const [results, setResults] = useState<StreamingDomainResult[]>([])
   const [parsed, setParsed] = useState<ParsedQuery | null>(null)
   const [absoluteCheapCount, setAbsoluteCheapCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
@@ -22,8 +32,6 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
 
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const initialLoaded = useRef(false)
-
-  const { visible: visibleResults } = useStaggeredReveal(results, { stepMs: 60 })
 
   const loadResults = useCallback(
     async (searchQuery: string, pageNum: number) => {
@@ -48,12 +56,17 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
 
         if (!res.ok || !json) return
 
+        const streamRows = toStreamingResults(json.results)
+
         if (pageNum === 0) {
           setParsed(json.parsed)
           setAbsoluteCheapCount(json.absoluteCheapCount)
-          setResults(json.results)
+          setResults(streamRows)
         } else {
-          setResults((prev) => [...prev, ...json.results.slice(prev.length)])
+          setResults((prev) => [
+            ...prev,
+            ...streamRows.slice(prev.length),
+          ])
         }
         setHasMore(json.hasMore)
         setPage(pageNum)
@@ -97,24 +110,20 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
       <SiteHeader />
       <main className="mx-auto w-full max-w-5xl px-6 py-12">
         <section className="space-y-6">
-          <div className="mx-auto space-y-2 text-center">
-            <div className="flex justify-center">
-              <Sticker tone="muted">
+          <div className="space-y-2">
+            <Sticker tone="muted">
               {parsed?.type === "exact" ? "exact check" : "name search"}
-              </Sticker>
-            </div>
+            </Sticker>
             <h1 className="mode-headline font-mono text-3xl font-semibold tracking-tight text-balance md:text-5xl">
               {query ? query : "type something to search"}
             </h1>
           </div>
-          <div className="mx-auto max-w-3xl">
-            <SearchBox defaultValue={query} size="default" />
-          </div>
+          <SearchBox defaultValue={query} size="default" />
         </section>
 
         <section className="mt-12">
           {!query ? (
-            <p className="mx-auto max-w-3xl text-center text-pretty text-muted-foreground">
+            <p className="text-pretty text-muted-foreground">
               Try a single word like{" "}
               <Link
                 href="/search?q=studio"
@@ -134,16 +143,14 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
           ) : null}
 
           {query && !parsed ? (
-            <p className="mx-auto max-w-3xl text-center text-pretty text-muted-foreground">
+            <p className="text-pretty text-muted-foreground">
               That input could not be turned into a domain. Try a single word or
               a full domain like example.xyz.
             </p>
           ) : null}
 
           {parsed && results.length === 0 && !loading ? (
-            <p className="mx-auto max-w-3xl text-center text-pretty text-muted-foreground">
-              No results yet.
-            </p>
+            <p className="text-pretty text-muted-foreground">No results yet.</p>
           ) : null}
 
           {results.length > 0 ? (
@@ -154,8 +161,8 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
                 </p>
               ) : null}
               <div className="mode-panel rounded border border-border bg-background px-3">
-                {visibleResults.map((result) => (
-                              <ResolvedDomainCard
+                {results.map((result) => (
+                  <StreamingDomainCard
                     key={result.domain}
                     result={result}
                     query={query}
@@ -180,4 +187,3 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
     </div>
   )
 }
-

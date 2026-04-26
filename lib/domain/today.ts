@@ -1,7 +1,7 @@
 import { buildDomainNotes } from "@/lib/domain/notes"
 import { checkAvailability } from "@/lib/domain/rdap"
 import { SEED_WORDS } from "@/lib/domain/seeds"
-import type { StreamingDomainResult } from "@/lib/domain/search"
+import type { StreamingDomainResult } from "@/lib/domain/types"
 import { fetchCheapTlds, porkbunBuyUrl } from "@/lib/registrars/porkbun"
 
 function hashString(input: string) {

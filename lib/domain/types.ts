@@ -14,7 +14,10 @@ export type DomainResult = {
   isAbsoluteCheap: boolean
 }
 
+export type StreamingDomainResult = Omit<DomainResult, "availability"> & {
+  availability: Promise<Availability>
+}
+
 export type ParsedQuery =
   | { type: "exact"; sld: string; tld: string }
   | { type: "name"; sld: string }
-

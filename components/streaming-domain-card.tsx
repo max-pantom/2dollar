@@ -5,7 +5,7 @@ import {
   AvailabilityResolver,
 } from "@/components/availability-tag"
 import { DomainCard } from "@/components/domain-card"
-import type { StreamingDomainResult } from "@/lib/domain/search"
+import type { StreamingDomainResult } from "@/lib/domain/types"
 
 export function StreamingDomainCard({
   result,

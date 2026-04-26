@@ -1,30 +1,15 @@
-import { buildDomainNotes, type DomainNote } from "@/lib/domain/notes"
+import { buildDomainNotes } from "@/lib/domain/notes"
 import { checkAvailability, type Availability } from "@/lib/domain/rdap"
+import type {
+  DomainResult,
+  ParsedQuery,
+  StreamingDomainResult,
+} from "@/lib/domain/types"
 import { fetchCheapTlds, porkbunBuyUrl } from "@/lib/registrars/porkbun"
 
 export { SEED_WORDS, pickRandomSeed } from "@/lib/domain/seeds"
 export type { DomainNote } from "@/lib/domain/notes"
-
-export type DomainResult = {
-  domain: string
-  sld: string
-  tld: string
-  availability: Availability
-  firstYearPrice: number
-  renewalPrice: number
-  registrar: "Porkbun"
-  buyUrl: string
-  notes: DomainNote[]
-  isAbsoluteCheap: boolean
-}
-
-export type StreamingDomainResult = Omit<DomainResult, "availability"> & {
-  availability: Promise<Availability>
-}
-
-export type ParsedQuery =
-  | { type: "exact"; sld: string; tld: string }
-  | { type: "name"; sld: string }
+export type { DomainResult, ParsedQuery, StreamingDomainResult } from "@/lib/domain/types"
 
 const NAME_PREFIXES = [
   "get",
