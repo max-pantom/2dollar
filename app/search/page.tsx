@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect, useRef, useCallback } from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
 
@@ -6,23 +9,17 @@ import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { Sticker } from "@/components/sticker"
 import { StreamingDomainCard } from "@/components/streaming-domain-card"
-import { searchDomainStream } from "@/lib/domain/search"
+import { searchDomainStream, type StreamingDomainResult, type ParsedQuery } from "@/lib/domain/search"
 
 export const dynamic = "force-dynamic"
 
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>
-}): Promise<Metadata> {
-  const { q } = await searchParams
-  const query = q?.trim() ?? ""
+export function generateMetadata({ searchParams }: { searchParams: { q?: string } }): Metadata {
+  const query = searchParams.q?.trim() ?? ""
 
   if (!query) {
     return {
       title: "search",
-      description:
-        "Search any idea and find cheap available domains around $2.",
+      description: "Search any idea and find cheap available domains around $2.",
     }
   }
 
@@ -44,14 +41,68 @@ export async function generateMetadata({
   }
 }
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>
-}) {
-  const { q } = await searchParams
-  const query = q?.trim() ?? ""
-  const { parsed, results, absoluteCheapCount } = await searchDomainStream(query)
+export default function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const [query, setQuery] = useState("")
+  const [results, setResults] = useState<StreamingDomainResult[]>([])
+  const [parsed, setParsed] = useState<ParsedQuery | null>(null)
+  const [absoluteCheapCount, setAbsoluteCheapCount] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [page, setPage] = useState(0)
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+  const initialLoaded = useRef(false)
+
+  useEffect(() => {
+    searchParams.then(({ q }) => {
+      const qValue = q?.trim() ?? ""
+      setQuery(qValue)
+      if (qValue && !initialLoaded.current) {
+        initialLoaded.current = true
+        loadResults(qValue, 0, true)
+      }
+    })
+  }, [searchParams])
+
+  async function loadResults(searchQuery: string, pageNum: number, replace = false) {
+    if (loading) return
+    setLoading(true)
+    try {
+      const limit = 50
+      const stream = await searchDomainStream(searchQuery, limit + pageNum * limit)
+      if (pageNum === 0) {
+        setParsed(stream.parsed)
+        setAbsoluteCheapCount(stream.absoluteCheapCount)
+        setResults(stream.results)
+      } else {
+        setResults((prev) => [...prev, ...stream.results.slice(prev.length)])
+      }
+      setHasMore(stream.hasMore)
+      setPage(pageNum)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadMore = useCallback(() => {
+    if (!hasMore || loading) return
+    loadResults(query, page + 1)
+  }, [hasMore, loading, query, page])
+
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasMore) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore()
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    observer.observe(loadMoreRef.current)
+    return () => observer.disconnect()
+  }, [hasMore, loadMore])
 
   return (
     <div className="min-h-dvh">
@@ -73,17 +124,11 @@ export default async function SearchPage({
           {!query ? (
             <p className="text-pretty text-muted-foreground">
               Try a single word like{" "}
-              <Link
-                href="/search?q=studio"
-                className="underline underline-offset-4"
-              >
+              <Link href="/search?q=studio" className="underline underline-offset-4">
                 studio
               </Link>{" "}
               or an exact domain like{" "}
-              <Link
-                href="/search?q=hello.xyz"
-                className="underline underline-offset-4"
-              >
+              <Link href="/search?q=hello.xyz" className="underline underline-offset-4">
                 hello.xyz
               </Link>
               .
@@ -92,15 +137,12 @@ export default async function SearchPage({
 
           {query && !parsed ? (
             <p className="text-pretty text-muted-foreground">
-              That input could not be turned into a domain. Try a single word or
-              a full domain like example.xyz.
+              That input could not be turned into a domain. Try a single word or a full domain like example.xyz.
             </p>
           ) : null}
 
-          {parsed && results.length === 0 ? (
-            <p className="text-pretty text-muted-foreground">
-              No results yet. The registrar pricing API may be slow. Try again.
-            </p>
+          {parsed && results.length === 0 && !loading ? (
+            <p className="text-pretty text-muted-foreground">No results yet.</p>
           ) : null}
 
           {results.length > 0 ? (
@@ -112,12 +154,14 @@ export default async function SearchPage({
               )}
               <div className="mode-panel rounded border border-border bg-background px-3">
                 {results.map((result) => (
-                  <StreamingDomainCard
-                    key={result.domain}
-                    result={result}
-                    query={query}
-                  />
+                  <StreamingDomainCard key={result.domain} result={result} query={query} />
                 ))}
+              </div>
+              <div ref={loadMoreRef} className="mt-4 text-center">
+                {loading && <span className="text-muted-foreground">Loading more...</span>}
+                {!hasMore && results.length > 0 && (
+                  <span className="text-sm text-muted-foreground">Showing all results</span>
+                )}
               </div>
             </>
           ) : null}

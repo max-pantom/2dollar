@@ -26,6 +26,46 @@ export type ParsedQuery =
   | { type: "exact"; sld: string; tld: string }
   | { type: "name"; sld: string }
 
+const NAME_PREFIXES = [
+  "get",
+  "my",
+  "try",
+  "use",
+  "go",
+  "hi",
+  "hey",
+  "app",
+  "io",
+  "me",
+  "we",
+  "do",
+  "make",
+  "build",
+  "run",
+  "start",
+  "join",
+  "let",
+]
+
+const UNINTERESTING_PREFIXES = new Set([
+  "get",
+  "my",
+  "try",
+  "use",
+  "go",
+  "hi",
+  "hey",
+  "app",
+  "io",
+  "me",
+  "we",
+  "do",
+])
+
+function isUninterestingPrefix(word: string): boolean {
+  return UNINTERESTING_PREFIXES.has(word.toLowerCase())
+}
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()
@@ -66,8 +106,8 @@ export function parseQuery(input: string): ParsedQuery | null {
 
 export async function searchDomain(
   query: string,
-  limit = 15
-): Promise<{ parsed: ParsedQuery | null; results: DomainResult[]; absoluteCheapCount: number }> {
+  limit = 50
+): Promise<{ parsed: ParsedQuery | null; results: DomainResult[]; absoluteCheapCount: number; hasMore: boolean }> {
   const stream = await searchDomainStream(query, limit)
   const results = await Promise.all(
     stream.results.map(async (item) => ({
@@ -79,6 +119,7 @@ export async function searchDomain(
   return {
     parsed: stream.parsed,
     absoluteCheapCount: stream.absoluteCheapCount,
+    hasMore: stream.hasMore,
     results: results.sort(
       (a, b) =>
         availabilityOrder(a.availability) - availabilityOrder(b.availability) ||
@@ -89,19 +130,20 @@ export async function searchDomain(
 
 export async function searchDomainStream(
   query: string,
-  limit = 15
+  limit = 50
 ): Promise<{
   parsed: ParsedQuery | null
   results: StreamingDomainResult[]
   absoluteCheapCount: number
+  hasMore: boolean
 }> {
   const parsed = parseQuery(query)
 
   if (!parsed) {
-    return { parsed: null, results: [], absoluteCheapCount: 0 }
+    return { parsed: null, results: [], absoluteCheapCount: 0, hasMore: false }
   }
 
-  const tlds = await fetchCheapTlds()
+  const tlds = await fetchCheapTlds(5)
   const absoluteCheapTlds = tlds.filter((t) => t.firstYearPrice <= 2)
   const absoluteCheapCount = absoluteCheapTlds.length
 
@@ -111,9 +153,35 @@ export async function searchDomainStream(
     const firstYearPrice = tldInfo?.firstYearPrice ?? 0
     const renewalPrice = tldInfo?.renewalPrice ?? 0
 
+    const variations: StreamingDomainResult[] = []
+
+    for (const prefix of NAME_PREFIXES) {
+      const variant = `${prefix}${parsed.sld}`
+      if (variant !== parsed.sld) {
+        variations.push({
+          domain: `${variant}.${parsed.tld}`,
+          sld: variant,
+          tld: parsed.tld,
+          availability: checkAvailability(`${variant}.${parsed.tld}`),
+          firstYearPrice,
+          renewalPrice,
+          registrar: "Porkbun",
+          buyUrl: porkbunBuyUrl(`${variant}.${parsed.tld}`),
+          notes: buildDomainNotes({
+            sld: variant,
+            tld: parsed.tld,
+            firstYearPrice,
+            renewalPrice,
+          }),
+          isAbsoluteCheap: firstYearPrice <= 2,
+        })
+      }
+    }
+
     return {
       parsed,
       absoluteCheapCount,
+      hasMore: false,
       results: [
         {
           domain: fullDomain,
@@ -132,23 +200,23 @@ export async function searchDomainStream(
           }),
           isAbsoluteCheap: firstYearPrice <= 2,
         },
+        ...variations,
       ],
     }
   }
 
-  const candidates = tlds.slice(0, limit)
+  const allResults: StreamingDomainResult[] = []
 
-  const results = candidates.map((tld) => {
-    const fullDomain = `${parsed.sld}.${tld.extension}`
-    return {
-      domain: fullDomain,
+  for (const tld of tlds) {
+    allResults.push({
+      domain: `${parsed.sld}.${tld.extension}`,
       sld: parsed.sld,
       tld: tld.extension,
-      availability: checkAvailability(fullDomain),
+      availability: checkAvailability(`${parsed.sld}.${tld.extension}`),
       firstYearPrice: tld.firstYearPrice,
       renewalPrice: tld.renewalPrice,
       registrar: "Porkbun" as const,
-      buyUrl: porkbunBuyUrl(fullDomain),
+      buyUrl: porkbunBuyUrl(`${parsed.sld}.${tld.extension}`),
       notes: buildDomainNotes({
         sld: parsed.sld,
         tld: tld.extension,
@@ -156,10 +224,36 @@ export async function searchDomainStream(
         renewalPrice: tld.renewalPrice,
       }),
       isAbsoluteCheap: tld.firstYearPrice <= 2,
-    }
-  })
+    })
 
-  return { parsed, results, absoluteCheapCount }
+    if (!isUninterestingPrefix(parsed.sld)) {
+      for (const prefix of NAME_PREFIXES) {
+        const variant = `${prefix}${parsed.sld}`
+        allResults.push({
+          domain: `${variant}.${tld.extension}`,
+          sld: variant,
+          tld: tld.extension,
+          availability: checkAvailability(`${variant}.${tld.extension}`),
+          firstYearPrice: tld.firstYearPrice,
+          renewalPrice: tld.renewalPrice,
+          registrar: "Porkbun" as const,
+          buyUrl: porkbunBuyUrl(`${variant}.${tld.extension}`),
+          notes: buildDomainNotes({
+            sld: variant,
+            tld: tld.extension,
+            firstYearPrice: tld.firstYearPrice,
+            renewalPrice: tld.renewalPrice,
+          }),
+          isAbsoluteCheap: tld.firstYearPrice <= 2,
+        })
+      }
+    }
+  }
+
+  const results = allResults.slice(0, limit)
+  const hasMore = allResults.length > limit
+
+  return { parsed, results, absoluteCheapCount, hasMore }
 }
 
 function availabilityOrder(availability: Availability) {
