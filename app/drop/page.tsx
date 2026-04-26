@@ -33,12 +33,12 @@ export default function DropPage() {
           </h1>
           <p className="max-w-2xl text-pretty text-muted-foreground">
             A real-time price list pulled from the Porkbun public pricing API.
-            Sorted by first-year price, capped at $2.50.
+            Sorted by first-year price, showing all TLDs under $5.
           </p>
         </section>
 
         <section className="mt-12 space-y-5">
-          <TldList limit={20} />
+          <TldList />
         </section>
 
         <section className="mt-16 space-y-3">

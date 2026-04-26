@@ -38,3 +38,36 @@ From the original spec.
 - Background job: nightly pricing refresh (cron) writing into Supabase / Neon.
 - Receipt PDF download per domain.
 - "Sold receipts" wall: redacted receipts of domains people actually bought.
+
+## Almost bought wall
+
+- Public wall of domains people almost bought.
+- Positioning: social, voyeuristic, lightweight. People love seeing what others nearly claimed.
+- Show promo price on each domain card.
+- Add a claim post generator for domains someone actually buys.
+
+Almost bought today:
+
+- `rentafounder.xyz`
+- `buttonfarm.site`
+- `auntieapi.fun`
+- `sponsorcrate.xyz`
+
+Claim post generator copy:
+
+```txt
+I bought fanledger.site for $1.98.
+
+No idea if I'll build it.
+That is tomorrow's problem.
+```
+
+## Monetization later
+
+- Start with affiliate links.
+- Later add sponsored daily drops.
+- Later add newsletter sponsorships.
+- Later add premium filters.
+- Later add domain deal email.
+- Later add startup naming packs.
+- Later add featured registrar partnerships.
