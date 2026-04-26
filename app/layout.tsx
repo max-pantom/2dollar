@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
 
 import "./globals.css"
 import { KeyboardShortcuts } from "@/components/keyboard-shortcuts"
@@ -49,16 +48,6 @@ export const metadata: Metadata = {
   },
 }
 
-const fontSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-})
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -69,7 +58,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-mode="calm"
-      className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
+      className="font-sans antialiased"
     >
       <head>
         <ModeBoot />

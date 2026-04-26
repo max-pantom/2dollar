@@ -7,17 +7,16 @@ import { SearchBox } from "@/components/search-box"
 import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { Sticker } from "@/components/sticker"
-import { StreamingDomainCard } from "@/components/streaming-domain-card"
+import { ResolvedDomainCard } from "@/components/resolved-domain-card"
 import { useStaggeredReveal } from "@/components/staggered-reveal"
 import {
-  searchDomainStream,
   type ParsedQuery,
-  type StreamingDomainResult,
+  type DomainResult,
 } from "@/lib/domain/search"
 
 export function SearchClient({ initialQuery }: { initialQuery: string }) {
   const [query] = useState(initialQuery)
-  const [results, setResults] = useState<StreamingDomainResult[]>([])
+  const [results, setResults] = useState<DomainResult[]>([])
   const [parsed, setParsed] = useState<ParsedQuery | null>(null)
   const [absoluteCheapCount, setAbsoluteCheapCount] = useState(0)
   const [hasMore, setHasMore] = useState(false)
@@ -34,19 +33,32 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
       if (loading) return
       setLoading(true)
       try {
-        const limit = 50
-        const stream = await searchDomainStream(
-          searchQuery,
-          limit + pageNum * limit
-        )
+        const pageSize = 50
+        const limit = Math.min(200, pageSize + pageNum * pageSize)
+        const res = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: searchQuery, limit }),
+        })
+        const json = (await res.json().catch(() => null)) as
+          | null
+          | {
+              parsed: ParsedQuery | null
+              results: DomainResult[]
+              absoluteCheapCount: number
+              hasMore: boolean
+            }
+
+        if (!res.ok || !json) return
+
         if (pageNum === 0) {
-          setParsed(stream.parsed)
-          setAbsoluteCheapCount(stream.absoluteCheapCount)
-          setResults(stream.results)
+          setParsed(json.parsed)
+          setAbsoluteCheapCount(json.absoluteCheapCount)
+          setResults(json.results)
         } else {
-          setResults((prev) => [...prev, ...stream.results.slice(prev.length)])
+          setResults((prev) => [...prev, ...json.results.slice(prev.length)])
         }
-        setHasMore(stream.hasMore)
+        setHasMore(json.hasMore)
         setPage(pageNum)
       } finally {
         setLoading(false)
@@ -146,7 +158,7 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
               ) : null}
               <div className="mode-panel rounded border border-border bg-background px-3">
                 {visibleResults.map((result) => (
-                  <StreamingDomainCard
+                              <ResolvedDomainCard
                     key={result.domain}
                     result={result}
                     query={query}

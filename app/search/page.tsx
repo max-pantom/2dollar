@@ -3,8 +3,13 @@ import { SearchClient } from "@/app/search/search-client"
 
 export const dynamic = "force-dynamic"
 
-export function generateMetadata({ searchParams }: { searchParams: { q?: string } }): Metadata {
-  const query = searchParams.q?.trim() ?? ""
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}): Promise<Metadata> {
+  const { q } = await searchParams
+  const query = q?.trim() ?? ""
 
   if (!query) {
     return {

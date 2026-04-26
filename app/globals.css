@@ -16,6 +16,11 @@
 
 :root,
 [data-mode="calm"] {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
   --mode-bg: #ffffff;
   --mode-fg: #111111;
   --mode-muted: #f4f4f5;
