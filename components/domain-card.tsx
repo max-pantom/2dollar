@@ -19,6 +19,7 @@ export type DomainCardProps = {
   notes?: DomainNote[]
   query?: string
   defaultOpen?: boolean
+  isAbsoluteCheap?: boolean
 }
 
 export function DomainCard({
@@ -29,6 +30,7 @@ export function DomainCard({
   buyUrl,
   availabilitySlot,
   notes = [],
+  isAbsoluteCheap = false,
   query,
   defaultOpen = false,
 }: DomainCardProps) {
@@ -65,7 +67,11 @@ export function DomainCard({
           <span className="truncate font-mono text-lg font-medium tracking-tight md:text-xl">
             {domain}
           </span>
-          {isDeal ? (
+          {isAbsoluteCheap ? (
+            <span className="hidden md:inline-flex">
+              <Sticker tone="deal">&lt;$2</Sticker>
+            </span>
+          ) : isDeal ? (
             <span className="hidden md:inline-flex">
               <Sticker tone="deal">$2-ish</Sticker>
             </span>

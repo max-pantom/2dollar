@@ -79,7 +79,7 @@ type PorkbunPricingResponse = {
   >
 }
 
-export async function fetchCheapTlds(maxPrice = 2.5): Promise<TldPrice[]> {
+export async function fetchCheapTlds(maxPrice = 5): Promise<TldPrice[]> {
   try {
     const response = await fetch(
       "https://api.porkbun.com/api/json/v3/pricing/get",

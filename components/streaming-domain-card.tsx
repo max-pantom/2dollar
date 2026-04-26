@@ -26,6 +26,7 @@ export function StreamingDomainCard({
       notes={result.notes}
       query={query}
       defaultOpen={defaultOpen}
+      isAbsoluteCheap={result.isAbsoluteCheap}
       availabilitySlot={
         <Suspense fallback={<AvailabilityChecking />}>
           <AvailabilityResolver promise={result.availability} />

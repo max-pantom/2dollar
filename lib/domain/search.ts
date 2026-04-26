@@ -15,6 +15,7 @@ export type DomainResult = {
   registrar: "Porkbun"
   buyUrl: string
   notes: DomainNote[]
+  isAbsoluteCheap: boolean
 }
 
 export type StreamingDomainResult = Omit<DomainResult, "availability"> & {
@@ -65,8 +66,8 @@ export function parseQuery(input: string): ParsedQuery | null {
 
 export async function searchDomain(
   query: string,
-  limit = 6
-): Promise<{ parsed: ParsedQuery | null; results: DomainResult[] }> {
+  limit = 15
+): Promise<{ parsed: ParsedQuery | null; results: DomainResult[]; absoluteCheapCount: number }> {
   const stream = await searchDomainStream(query, limit)
   const results = await Promise.all(
     stream.results.map(async (item) => ({
@@ -77,6 +78,7 @@ export async function searchDomain(
 
   return {
     parsed: stream.parsed,
+    absoluteCheapCount: stream.absoluteCheapCount,
     results: results.sort(
       (a, b) =>
         availabilityOrder(a.availability) - availabilityOrder(b.availability) ||
@@ -87,18 +89,21 @@ export async function searchDomain(
 
 export async function searchDomainStream(
   query: string,
-  limit = 6
+  limit = 15
 ): Promise<{
   parsed: ParsedQuery | null
   results: StreamingDomainResult[]
+  absoluteCheapCount: number
 }> {
   const parsed = parseQuery(query)
 
   if (!parsed) {
-    return { parsed: null, results: [] }
+    return { parsed: null, results: [], absoluteCheapCount: 0 }
   }
 
   const tlds = await fetchCheapTlds()
+  const absoluteCheapTlds = tlds.filter((t) => t.firstYearPrice <= 2)
+  const absoluteCheapCount = absoluteCheapTlds.length
 
   if (parsed.type === "exact") {
     const tldInfo = tlds.find((item) => item.extension === parsed.tld)
@@ -108,6 +113,7 @@ export async function searchDomainStream(
 
     return {
       parsed,
+      absoluteCheapCount,
       results: [
         {
           domain: fullDomain,
@@ -124,6 +130,7 @@ export async function searchDomainStream(
             firstYearPrice,
             renewalPrice,
           }),
+          isAbsoluteCheap: firstYearPrice <= 2,
         },
       ],
     }
@@ -148,10 +155,11 @@ export async function searchDomainStream(
         firstYearPrice: tld.firstYearPrice,
         renewalPrice: tld.renewalPrice,
       }),
+      isAbsoluteCheap: tld.firstYearPrice <= 2,
     }
   })
 
-  return { parsed, results }
+  return { parsed, results, absoluteCheapCount }
 }
 
 function availabilityOrder(availability: Availability) {

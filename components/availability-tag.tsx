@@ -10,6 +10,7 @@ export function AvailabilityTag({
 }) {
   return (
     <span
+      data-availability={availability}
       className={cn(
         "inline-flex items-center gap-1.5 text-xs font-medium",
         availability === "available" && "text-accent",
@@ -34,7 +35,10 @@ export function AvailabilityTag({
 
 export function AvailabilityChecking() {
   return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+    <span
+      data-availability="checking"
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+    >
       <span className="checking-dot inline-block size-2 rounded-full bg-muted-foreground" />
       checking
     </span>

@@ -50,6 +50,7 @@ export async function getTodayFindsStream(
         firstYearPrice: tld.firstYearPrice,
         renewalPrice: tld.renewalPrice,
       }),
+      isAbsoluteCheap: tld.firstYearPrice <= 2,
     }
   })
 }

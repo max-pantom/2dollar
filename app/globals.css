@@ -113,17 +113,28 @@ h3 {
 }
 
 /* heading style swap */
-h1.mode-headline,
-h2.mode-headline {
+.mode-headline {
   color: var(--mode-heading-color);
-  text-shadow: var(--mode-heading-shadow);
-  -webkit-text-stroke: var(--mode-heading-stroke) var(--mode-fg);
   transform: skewY(var(--mode-heading-skew));
   transform-origin: left center;
   transition:
     color 280ms ease,
     text-shadow 280ms ease,
     transform 320ms ease;
+}
+[data-mode="scene"] h1.mode-headline {
+  text-shadow: 5px 5px 0 var(--mode-fg);
+  -webkit-text-stroke: 1.5px var(--mode-fg);
+  paint-order: stroke fill;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  animation: ink-jitter 1.25s steps(2, end) infinite;
+}
+[data-mode="scene"] h2.mode-headline {
+  color: var(--mode-fg);
+  text-shadow: 3px 3px 0 var(--mode-accent);
+  font-weight: 800;
+  letter-spacing: 0.01em;
 }
 
 /* card surfaces in scene mode */
@@ -253,5 +264,26 @@ h2.mode-headline {
   h1.mode-headline,
   h2.mode-headline {
     transition-duration: 0ms !important;
+  }
+  [data-mode="scene"] h1.mode-headline {
+    animation: none !important;
+  }
+}
+
+@keyframes ink-jitter {
+  0% {
+    text-shadow: 5px 5px 0 var(--mode-fg);
+  }
+  25% {
+    text-shadow: 6px 5px 0 var(--mode-fg);
+  }
+  50% {
+    text-shadow: 5px 6px 0 var(--mode-fg);
+  }
+  75% {
+    text-shadow: 6px 6px 0 var(--mode-fg);
+  }
+  100% {
+    text-shadow: 5px 5px 0 var(--mode-fg);
   }
 }

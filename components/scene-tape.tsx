@@ -1,3 +1,5 @@
+import { SceneProgressGrid } from "@/components/scene-progress-grid"
+
 type SceneTapeProps = {
   position?: "top" | "bottom"
 }
@@ -35,7 +37,7 @@ export function SceneTape({ position = "top" }: SceneTapeProps) {
       className={`scene-tape${position === "bottom" ? "scene-tape--bottom" : ""}`}
       aria-hidden="true"
     >
-      <span className="flex items-center gap-3">
+      <span className="flex min-w-0 flex-1 items-end justify-end gap-3 whitespace-nowrap">
         {left.map((item) => (
           <span key={item.label} className="flex items-center gap-1.5">
             <span className="font-bold">{item.label}</span>
@@ -43,7 +45,7 @@ export function SceneTape({ position = "top" }: SceneTapeProps) {
           </span>
         ))}
       </span>
-      <span className="ml-auto flex items-center gap-3">
+      <span className="flex items-end gap-3 whitespace-nowrap">
         {right.map((item) => (
           <span key={item.label} className="flex items-center gap-1.5">
             <span className="font-bold">{item.label}</span>
@@ -59,6 +61,7 @@ export function SceneTape({ position = "top" }: SceneTapeProps) {
             />
           ))}
         </span>
+        {position === "top" ? <SceneProgressGrid /> : null}
       </span>
     </div>
   )

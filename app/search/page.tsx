@@ -51,7 +51,7 @@ export default async function SearchPage({
 }) {
   const { q } = await searchParams
   const query = q?.trim() ?? ""
-  const { parsed, results } = await searchDomainStream(query)
+  const { parsed, results, absoluteCheapCount } = await searchDomainStream(query)
 
   return (
     <div className="min-h-dvh">
@@ -104,15 +104,22 @@ export default async function SearchPage({
           ) : null}
 
           {results.length > 0 ? (
-            <div className="mode-panel rounded border border-border bg-background px-3">
-              {results.map((result) => (
-                <StreamingDomainCard
-                  key={result.domain}
-                  result={result}
-                  query={query}
-                />
-              ))}
-            </div>
+            <>
+              {absoluteCheapCount > 0 && (
+                <p className="mb-4 text-sm text-muted-foreground">
+                  {absoluteCheapCount} TLDs available for under $2
+                </p>
+              )}
+              <div className="mode-panel rounded border border-border bg-background px-3">
+                {results.map((result) => (
+                  <StreamingDomainCard
+                    key={result.domain}
+                    result={result}
+                    query={query}
+                  />
+                ))}
+              </div>
+            </>
           ) : null}
         </section>
       </main>
