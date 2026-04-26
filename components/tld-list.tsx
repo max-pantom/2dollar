@@ -28,7 +28,7 @@ export function TldList({ initialLimit = 20 }: { initialLimit?: number }) {
     if (loading) return
     setLoading(true)
     try {
-      const limit = 50
+      const limit = initialLimit
       const data = await fetchTlds(limit, pageNum * limit)
       if (pageNum === 0) {
         setTlds(data.tlds)
@@ -41,7 +41,7 @@ export function TldList({ initialLimit = 20 }: { initialLimit?: number }) {
     } finally {
       setLoading(false)
     }
-  }, [loading])
+  }, [loading, initialLimit])
 
   useEffect(() => {
     if (initialLoaded.current) return

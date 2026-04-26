@@ -70,7 +70,7 @@ export default function Page() {
               full daily drop &rarr;
             </Link>
           </div>
-          <TldList limit={8} />
+          <TldList initialLimit={8} />
           <ReceiptEdge />
         </section>
       </main>
