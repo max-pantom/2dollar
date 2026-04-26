@@ -1,0 +1,257 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-background: var(--mode-bg);
+  --color-foreground: var(--mode-fg);
+  --color-muted: var(--mode-muted);
+  --color-muted-foreground: var(--mode-muted-fg);
+  --color-border: var(--mode-border);
+  --color-accent: var(--mode-accent);
+  --color-accent-soft: var(--mode-accent-soft);
+  --color-warning: var(--mode-warning);
+  --radius: var(--mode-radius);
+}
+
+:root,
+[data-mode="calm"] {
+  --mode-bg: #faf7f0;
+  --mode-fg: #161513;
+  --mode-muted: #f1ede4;
+  --mode-muted-fg: #6f6b63;
+  --mode-border: #e7dfd2;
+  --mode-accent: #2fbf71;
+  --mode-accent-soft: #e8f8ef;
+  --mode-warning: #f2b84b;
+  --mode-radius: 4px;
+
+  --mode-card-shadow: 0 0 0 0 transparent;
+  --mode-card-border: 1px solid var(--mode-border);
+  --mode-heading-color: var(--mode-fg);
+  --mode-heading-stroke: 0;
+  --mode-heading-shadow: 0 0 0 transparent;
+  --mode-heading-skew: 0deg;
+  --mode-button-shadow: 0 0 0 0 transparent;
+}
+
+[data-mode="scene"] {
+  --mode-bg: #ffe600;
+  --mode-fg: #0f0f0f;
+  --mode-muted: #fff7e0;
+  --mode-muted-fg: #2a2a2a;
+  --mode-border: #0f0f0f;
+  --mode-accent: #e11d48;
+  --mode-accent-soft: #facc15;
+  --mode-warning: #f97316;
+  --mode-radius: 0;
+
+  --mode-card-shadow: 4px 4px 0 0 var(--mode-fg);
+  --mode-card-border: 3px solid var(--mode-fg);
+  --mode-heading-color: var(--mode-accent);
+  --mode-heading-stroke: 2px;
+  --mode-heading-shadow: 5px 5px 0 var(--mode-fg);
+  --mode-heading-skew: -2deg;
+  --mode-button-shadow: 3px 3px 0 0 var(--mode-fg);
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html,
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: white;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* mode transitions on color-bearing properties only (compositor-safe) */
+html,
+body,
+header,
+footer,
+section,
+article,
+aside,
+main,
+nav,
+details,
+summary,
+button,
+a,
+input,
+textarea,
+select,
+span,
+p,
+h1,
+h2,
+h3 {
+  transition-property: background-color, color, border-color, box-shadow,
+    text-shadow;
+  transition-duration: 280ms;
+  transition-timing-function: ease;
+}
+
+/* heading style swap */
+h1.mode-headline,
+h2.mode-headline {
+  color: var(--mode-heading-color);
+  text-shadow: var(--mode-heading-shadow);
+  -webkit-text-stroke: var(--mode-heading-stroke) var(--mode-fg);
+  transform: skewY(var(--mode-heading-skew));
+  transform-origin: left center;
+  transition:
+    color 280ms ease,
+    text-shadow 280ms ease,
+    transform 320ms ease;
+}
+
+/* card surfaces in scene mode */
+[data-mode="scene"] details {
+  border-top: 0;
+  margin-top: 14px;
+}
+[data-mode="scene"] details:first-child {
+  margin-top: 0;
+}
+[data-mode="scene"] .mode-panel {
+  border: var(--mode-card-border);
+  box-shadow: var(--mode-card-shadow);
+  background: var(--mode-muted);
+}
+[data-mode="scene"] .mode-button {
+  border: 2px solid var(--mode-fg);
+  box-shadow: var(--mode-button-shadow);
+}
+
+/* halftone overlay for scene mode (fixed, very subtle) */
+.scene-halftone {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    var(--mode-fg) 1px,
+    transparent 1.4px
+  );
+  background-size: 14px 14px;
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 320ms ease;
+}
+[data-mode="scene"] .scene-halftone {
+  opacity: 0.07;
+}
+
+/* status tape (top + bottom data ribbon, scene only) */
+.scene-tape {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mode-fg);
+  background: var(--mode-bg);
+  border-color: var(--mode-fg);
+  overflow: hidden;
+  opacity: 0;
+  max-height: 0;
+  pointer-events: none;
+  transition:
+    opacity 280ms ease,
+    max-height 320ms ease;
+}
+[data-mode="scene"] .scene-tape {
+  opacity: 1;
+  max-height: 40px;
+  pointer-events: auto;
+  border-bottom: 2px solid var(--mode-fg);
+}
+[data-mode="scene"] .scene-tape--bottom {
+  border-bottom: 0;
+  border-top: 2px solid var(--mode-fg);
+}
+.scene-tape-checkers {
+  display: inline-flex;
+  gap: 2px;
+}
+.scene-tape-checkers > span {
+  width: 8px;
+  height: 8px;
+  background: var(--mode-fg);
+}
+.scene-tape-checkers > span.is-empty {
+  background: transparent;
+  border: 1px solid var(--mode-fg);
+}
+
+/* price tape marquee */
+@keyframes price-tape-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.price-tape-track {
+  animation: price-tape-scroll 60s linear infinite;
+  will-change: transform;
+}
+.price-tape:hover .price-tape-track,
+.price-tape:focus-within .price-tape-track {
+  animation-play-state: paused;
+}
+
+@keyframes checking-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.checking-dot {
+  animation: checking-pulse 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .price-tape-track,
+  .checking-dot {
+    animation: none;
+  }
+  html,
+  body,
+  *,
+  h1.mode-headline,
+  h2.mode-headline {
+    transition-duration: 0ms !important;
+  }
+}
