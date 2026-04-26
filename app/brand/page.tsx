@@ -82,7 +82,19 @@ export default function BrandPage() {
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-5xl">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Brand Draw</h1>
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold">Brand</h1>
+            <div className="font-mono text-xs text-muted-foreground">
+              Try{" "}
+              <a
+                className="underline underline-offset-4 hover:text-foreground"
+                href="/brand/2"
+              >
+                /brand/2
+              </a>{" "}
+              for GlyphMix wordmarks.
+            </div>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={undo}
