@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer"
 import { SiteHeader } from "@/components/site-header"
 import { Sticker } from "@/components/sticker"
 import { StreamingDomainCard } from "@/components/streaming-domain-card"
+import { useStaggeredReveal } from "@/components/staggered-reveal"
 import {
   searchDomainStream,
   type ParsedQuery,
@@ -25,6 +26,8 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
 
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const initialLoaded = useRef(false)
+
+  const { visible: visibleResults } = useStaggeredReveal(results, { stepMs: 60 })
 
   const loadResults = useCallback(
     async (searchQuery: string, pageNum: number) => {
@@ -85,20 +88,24 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
       <SiteHeader />
       <main className="mx-auto w-full max-w-5xl px-6 py-12">
         <section className="space-y-6">
-          <div className="space-y-2">
-            <Sticker tone="muted">
+          <div className="mx-auto space-y-2 text-center">
+            <div className="flex justify-center">
+              <Sticker tone="muted">
               {parsed?.type === "exact" ? "exact check" : "name search"}
-            </Sticker>
+              </Sticker>
+            </div>
             <h1 className="mode-headline font-mono text-3xl font-semibold tracking-tight text-balance md:text-5xl">
               {query ? query : "type something to search"}
             </h1>
           </div>
-          <SearchBox defaultValue={query} size="default" />
+          <div className="mx-auto max-w-3xl">
+            <SearchBox defaultValue={query} size="default" />
+          </div>
         </section>
 
         <section className="mt-12">
           {!query ? (
-            <p className="text-pretty text-muted-foreground">
+            <p className="mx-auto max-w-3xl text-center text-pretty text-muted-foreground">
               Try a single word like{" "}
               <Link
                 href="/search?q=studio"
@@ -118,14 +125,16 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
           ) : null}
 
           {query && !parsed ? (
-            <p className="text-pretty text-muted-foreground">
+            <p className="mx-auto max-w-3xl text-center text-pretty text-muted-foreground">
               That input could not be turned into a domain. Try a single word or
               a full domain like example.xyz.
             </p>
           ) : null}
 
           {parsed && results.length === 0 && !loading ? (
-            <p className="text-pretty text-muted-foreground">No results yet.</p>
+            <p className="mx-auto max-w-3xl text-center text-pretty text-muted-foreground">
+              No results yet.
+            </p>
           ) : null}
 
           {results.length > 0 ? (
@@ -136,7 +145,7 @@ export function SearchClient({ initialQuery }: { initialQuery: string }) {
                 </p>
               ) : null}
               <div className="mode-panel rounded border border-border bg-background px-3">
-                {results.map((result) => (
+                {visibleResults.map((result) => (
                   <StreamingDomainCard
                     key={result.domain}
                     result={result}

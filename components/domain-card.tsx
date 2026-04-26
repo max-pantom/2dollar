@@ -59,7 +59,7 @@ export function DomainCard({
 
   return (
     <details
-      className="group border-t border-border first:border-t-0"
+      className="reveal-item group border-t border-border first:border-t-0"
       open={defaultOpen}
     >
       <summary className="-mx-2 flex cursor-pointer list-none items-center gap-3 rounded px-2 py-4 outline-none hover:bg-muted/40 focus-visible:bg-muted/50">

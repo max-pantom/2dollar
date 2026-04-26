@@ -16,14 +16,14 @@
 
 :root,
 [data-mode="calm"] {
-  --mode-bg: #faf7f0;
-  --mode-fg: #161513;
-  --mode-muted: #f1ede4;
-  --mode-muted-fg: #6f6b63;
-  --mode-border: #e7dfd2;
+  --mode-bg: #ffffff;
+  --mode-fg: #111111;
+  --mode-muted: #f4f4f5;
+  --mode-muted-fg: #6b7280;
+  --mode-border: #e5e7eb;
   --mode-accent: #2fbf71;
   --mode-accent-soft: #e8f8ef;
-  --mode-warning: #f2b84b;
+  --mode-warning: #f59e0b;
   --mode-radius: 4px;
 
   --mode-card-shadow: 0 0 0 0 transparent;
@@ -153,6 +153,25 @@ h3 {
   text-shadow: 3px 3px 0 var(--mode-accent);
   font-weight: 800;
   letter-spacing: 0.01em;
+}
+
+[data-mode="calm"] .mode-panel {
+  background: var(--mode-bg);
+}
+
+@keyframes list-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reveal-item {
+  animation: list-in 220ms ease both;
 }
 
 /* card surfaces in scene mode */

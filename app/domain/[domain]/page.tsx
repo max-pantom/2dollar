@@ -69,11 +69,15 @@ export default async function DomainDetailPage({
       <SiteHeader />
       <main className="mx-auto w-full max-w-5xl px-6 py-12">
         <section className="space-y-5">
-          <Sticker tone="muted">domain detail</Sticker>
-          <h1 className="mode-headline font-mono text-4xl font-semibold tracking-tight text-balance md:text-6xl">
+          <div className="flex justify-center">
+            <Sticker tone="muted">domain detail</Sticker>
+          </div>
+          <h1 className="mode-headline text-center font-mono text-4xl font-semibold tracking-tight text-balance md:text-6xl">
             {detail.domain}
           </h1>
-          <SearchBox defaultValue={sld || detail.domain} size="default" />
+          <div className="mx-auto max-w-3xl">
+            <SearchBox defaultValue={sld || detail.domain} size="default" />
+          </div>
         </section>
 
         <section className="mode-panel mt-10 rounded border border-border bg-background px-3">

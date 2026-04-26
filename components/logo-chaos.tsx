@@ -109,12 +109,12 @@ export function LogoChaos() {
   const [seed, setSeed] = useState(() => stableSeed)
   const svgRef = useRef<SVGSVGElement>(null)
 
-  // update every 2 seconds in scene mode
+  // update every 1 second in scene mode
   useEffect(() => {
     if (mode !== "scene") return
     const id = window.setInterval(() => {
       setSeed((s) => (s + 1) >>> 0)
-    }, 2000)
+    }, 1000)
     return () => window.clearInterval(id)
   }, [mode])
 

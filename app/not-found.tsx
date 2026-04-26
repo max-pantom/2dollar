@@ -32,17 +32,21 @@ export default function NotFound() {
             </div>
             <div className="border-t border-dashed border-border" />
 
-            <Sticker tone="warning">void</Sticker>
-            <h1 className="mode-headline font-mono text-4xl font-semibold tracking-tight text-balance md:text-5xl">
+            <div className="flex justify-center">
+              <Sticker tone="warning">void</Sticker>
+            </div>
+            <h1 className="mode-headline text-center font-mono text-4xl font-semibold tracking-tight text-balance md:text-5xl">
               this page was never printed.
             </h1>
-            <p className="text-pretty text-muted-foreground">
+            <p className="mx-auto max-w-2xl text-center text-pretty text-muted-foreground">
               No domain, no drop, no dice. Maybe the link expired with the
               motivation. Run a fresh search and let&apos;s find you a real one.
             </p>
 
             <div className="border-t border-dashed border-border" />
-            <SearchBox size="default" />
+            <div className="mx-auto max-w-3xl">
+              <SearchBox size="default" />
+            </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground">
               <span>void where prohibited.</span>
